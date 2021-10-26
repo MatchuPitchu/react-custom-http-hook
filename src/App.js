@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState, useCallback } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import useHttp from './hooks/useHttp';
 import Tasks from './components/Tasks/Tasks';
 import NewTask from './components/NewTask/NewTask';
@@ -11,28 +11,40 @@ const App = () => {
   // important: use useCallback to have the identical fn that is passed
   // as arg into useHttp hook, otherwise would trigger re-execution of
   // sendRequest fn in hook
-  // other solution: copy transformTasks fn into useEffect and pass it
+  // RECOMMANDED SOLUTION: copy transformTasks fn into useEffect and pass it
   // as second arg into fetchTasks fn -> then NO useCallback is needed
-  const transformTasks = useCallback(tasksObj => {
-    const loadedTasks = [];
-    for (const taskKey in tasksObj) {
-      loadedTasks.push({ id: taskKey, text: tasksObj[taskKey].text });
-    }
-    setTasks(loadedTasks);
+  // const transformTasks = useCallback(tasksObj => {
+  //   const loadedTasks = [];
+  //   for (const taskKey in tasksObj) {
+  //     loadedTasks.push({ id: taskKey, text: tasksObj[taskKey].text });
+  //   }
+  //   setTasks(loadedTasks);
 
-    // empty dependency arr because anything external is used
-    // (other than setTasks, but must not be listed)
-  }, []);
+  //   // empty dependency arr because anything external is used
+  //   // (other than setTasks, but must not be listed)
+  // }, []);
 
   // rename sendRequest into the alias fetchTasks
-  const { isLoading, error, sendRequest: fetchTasks } = useHttp(transformTasks); // pass arg into my custom hook fn
+  const { isLoading, error, sendRequest: fetchTasks } = useHttp(); // here I can pass arg into my custom hook fn
 
   useEffect(() => {
-    // pass obj for request configuration into fetchTasks fn that is the sendRequest fn in useHttp hook
-    fetchTasks({
-      url: 'https://react-http-ba0a9-default-rtdb.europe-west1.firebasedatabase.app/tasks.json',
-    });
+    const transformTasks = tasksObj => {
+      const loadedTasks = [];
+      for (const taskKey in tasksObj) {
+        loadedTasks.push({ id: taskKey, text: tasksObj[taskKey].text });
+      }
+      setTasks(loadedTasks);
+    };
 
+    // pass obj for request configuration into fetchTasks fn that is the sendRequest fn in useHttp hook
+    fetchTasks(
+      {
+        url: 'https://react-http-ba0a9-default-rtdb.europe-west1.firebasedatabase.app/tasks.json',
+      },
+      transformTasks
+    );
+
+    // EXPLAINATION OF OTHER NOT RECOMMANDED SOLUTION (-> look above):
     // without useCallbacks dependency array would create infinite loop:
     // -> this dependency would create an infinite loop since all states
     // in custom hook are attached to the component where hook is used

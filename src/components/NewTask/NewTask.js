@@ -12,9 +12,10 @@ const NewTask = ({ onAddTask }) => {
   };
 
   const enterTaskHandler = async taskText => {
+    // renamed sendRequest fn of useHttp hook
     sendTaskRequest(
       {
-        url: 'https://react-http-6b4a6.firebaseio.com/tasks.json',
+        url: 'https://react-http-ba0a9-default-rtdb.europe-west1.firebasedatabase.app/tasks.json',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: { text: taskText },

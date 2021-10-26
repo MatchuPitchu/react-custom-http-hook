@@ -44,15 +44,14 @@ const App = () => {
       transformTasks
     );
 
-    // EXPLAINATION OF OTHER NOT RECOMMANDED SOLUTION (-> look above):
-    // without useCallbacks dependency array would create infinite loop:
+    // without fetchTasks() wrapped into useCallback in useHttp hook,
+    // this dependency array would create infinite loop:
     // -> this dependency would create an infinite loop since all states
     // in custom hook are attached to the component where hook is used
     // -> a state update would trigger re-evaluation of component
     // -> this would recall the custom hook again
     // -> this recreates the sendRequest fn in useHttp and returns a new fn object
     // -> therefore useEffect here will run again
-    // solution: use useCallback in custom hook
   }, [fetchTasks]);
 
   const taskAddHandler = task => setTasks(prevTasks => [...prevTasks, task]);
